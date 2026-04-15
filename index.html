@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<!-- saved from url=(0066)file:///C:/Users/FredrikDokkNygaard/Downloads/m%C3%B8telogg_4.html -->
+<html lang="no"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Møtelogg – Jobbsøk</title>
+<link href="./index_files/css2" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F2EC;
+    --surface: #FDFBF7;
+    --border: #E0DBD1;
+    --text: #1A1814;
+    --muted: #7A7469;
+    --accent: #2D5016;
+    --accent-light: #E8F0DF;
+    --hot: #8B2000; --hot-bg: #FDF0EC;
+    --warm: #7A4800; --warm-bg: #FDF6EC;
+    --cold: #004B7A; --cold-bg: #EDF4FB;
+    --done: #2D5016; --done-bg: #E8F0DF;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  .sync-status {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .sync-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ccc;
+    flex-shrink: 0;
+  }
+  .sync-dot.ok { background: #3B6D11; }
+  .sync-dot.err { background: #8B2000; }
+  .sync-dot.loading { background: #7A4800; animation: pulse 1s infinite; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .setup-banner {
+    background: #FDF6EC;
+    border: 1px solid #F0D090;
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 14px;
+    color: #7A4800;
+  }
+
+  .setup-banner strong { font-weight: 500; display: block; margin-bottom: 4px; }
+  .setup-banner input {
+    margin-top: 8px;
+    font-size: 13px;
+    background: #fff;
+    border-color: #F0D090;
+    color: var(--text);
+  }
+  .setup-banner .setup-row { display: flex; gap: 8px; margin-top: 8px; }
+  .setup-banner .setup-row input { flex: 1; }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+  }
+
+  .stat-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--bg);
+    color: var(--text);
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #fff;
+  }
+
+  textarea { resize: vertical; min-height: 80px; }
+  .form-row { margin-top: 12px; }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 14px; }
+
+  button {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 11px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    transition: all 0.15s;
+    -webkit-appearance: none;
+  }
+
+  button:active { transform: scale(0.97); }
+  button:hover { background: var(--border); }
+
+  button.primary {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  button.primary:hover { background: #1e3a0f; }
+  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  button.small { font-size: 12px; padding: 7px 13px; }
+  button.danger { color: var(--hot); border-color: #F7C1B8; }
+  button.danger:hover { background: var(--hot-bg); }
+
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .toolbar input { flex: 1; min-width: 160px; }
+  .toolbar select { width: auto; min-width: 130px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--accent-light); }
+
+  .name { font-weight: 500; font-size: 14px; }
+  .company { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .b-hot { background: var(--hot-bg); color: var(--hot); }
+  .b-warm { background: var(--warm-bg); color: var(--warm); }
+  .b-cold { background: var(--cold-bg); color: var(--cold); }
+  .b-done { background: var(--done-bg); color: var(--done); }
+
+  .note-text { font-size: 12px; color: var(--muted); max-width: 260px; }
+  .follow-text { font-size: 12px; color: var(--cold); margin-top: 3px; }
+
+  .empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  /* Mobile cards */
+  .meeting-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .meeting-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .meeting-card-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--muted);
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .meeting-card-notes { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .meeting-card-follow { font-size: 12px; color: var(--cold); }
+  .meeting-card-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+
+  @media (max-width: 640px) {
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    header { padding: 0.875rem 1rem; }
+    .container { padding: 0.75rem; }
+    .card { padding: 1rem; }
+    input, select, textarea { font-size: 16px; padding: 12px 14px; }
+    button { padding: 13px 18px; font-size: 15px; }
+    button.small { padding: 10px 14px; font-size: 13px; }
+    .btn-row { flex-direction: column; }
+    .btn-row button { width: 100%; text-align: center; }
+    .desktop-table { display: none; }
+    .mobile-cards { display: block; }
+    .toolbar { flex-direction: column; }
+    .toolbar input, .toolbar select { width: 100%; }
+  }
+
+  @media (min-width: 641px) {
+    .mobile-cards { display: none; }
+    .desktop-table { display: block; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Møtelogg</h1>
+  <div class="sync-status">
+    <div class="sync-dot ok" id="sync-dot"></div>
+    <span id="sync-text">Synkronisert</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="setup-banner" id="setup-banner" style="display: none;">
+    <strong>Koble til Google Sheets</strong>
+    Lim inn URL og hemmelig nøkkel fra Google Apps Script, så lagres alle møter direkte i Google Drive.
+    <div class="setup-row">
+      <input type="url" id="script-url" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <div class="setup-row">
+      <input type="text" id="script-key" placeholder="Din hemmelige nøkkel (f.eks. hundeNavn2024blomst)" autocomplete="off">
+      <button onclick="saveScriptUrl()">Koble til</button>
+    </div>
+  </div>
+
+  <div class="stats" id="stats">
+    <div class="stat">
+      <div class="stat-number">1</div>
+      <div class="stat-label">Totalt møter</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">0</div>
+      <div class="stat-label">Varme leads</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">1</div>
+      <div class="stat-label">Aktive oppfølginger</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Registrer nytt møte</div>
+    <div class="grid2">
+      <div>
+        <label>Navn</label>
+        <input id="f-name" placeholder="Fornavn Etternavn" autocomplete="off">
+      </div>
+      <div>
+        <label>Selskap / stilling</label>
+        <input id="f-company" placeholder="Acme AS – Senior Rekrutterer">
+      </div>
+    </div>
+    <div class="grid3 form-row">
+      <div>
+        <label>Dato</label>
+        <input type="date" id="f-date">
+      </div>
+      <div>
+        <label>Møtetype</label>
+        <select id="f-type">
+          <option>Headhunter</option>
+          <option>Nettverksmøte</option>
+          <option>Jobbintervju</option>
+          <option>Kaffe / uformelt</option>
+          <option>Videomøte</option>
+          <option>Annet</option>
+        </select>
+      </div>
+      <div>
+        <label>Status</label>
+        <select id="f-status">
+          <option value="hot">Varm – følg opp snart</option>
+          <option value="warm">Lun – avventer svar</option>
+          <option value="cold">Kald – usikkert</option>
+          <option value="done">Avsluttet</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Tilbakemelding / notater</label>
+      <textarea id="f-notes" placeholder="Hva ble diskutert? Hva sa de om stillingen, din profil, markedet..."></textarea>
+    </div>
+    <div class="form-row">
+      <label>Neste oppfølging</label>
+      <input id="f-follow" placeholder="f.eks. 20. mai – send oppdatert CV til Kari">
+    </div>
+    <div class="btn-row">
+      <button class="primary" id="save-btn" onclick="addEntry()">Lagre møte</button>
+      <button onclick="clearForm()">Tøm skjema</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div class="card-title" style="margin-bottom:0">Alle møter</div>
+      <button class="small" onclick="loadFromSheets()">↻ Oppdater</button>
+    </div>
+    <div class="toolbar">
+      <input id="search" placeholder="Søk navn, selskap, notater..." oninput="render()">
+      <select id="filter-status" onchange="render()">
+        <option value="">Alle statuser</option>
+        <option value="hot">Varm</option>
+        <option value="warm">Lun</option>
+        <option value="cold">Kald</option>
+        <option value="done">Avsluttet</option>
+      </select>
+      <select id="filter-type" onchange="render()">
+        <option value="">Alle typer</option>
+        <option>Headhunter</option>
+        <option>Nettverksmøte</option>
+        <option>Jobbintervju</option>
+        <option>Kaffe / uformelt</option>
+        <option>Videomøte</option>
+        <option>Annet</option>
+      </select>
+    </div>
+    <div id="desktop-table" class="desktop-table">
+    <table>
+      <thead><tr>
+        <th>Person</th><th>Dato</th><th>Type</th><th>Status</th>
+        <th>Notater / oppfølging</th><th></th>
+      </tr></thead>
+      <tbody>
+        
+          <tr>
+            <td><div class="name">Bjørn Håkon Bærug</div><div class="company">Korn Ferry / Senior Partner</div></td>
+            <td style="white-space:nowrap;color:var(--muted);font-size:13px">14. apr 2026</td>
+            <td><span style="font-size:12px;color:var(--muted)">Headhunter</span></td>
+            <td><span class="badge b-warm">Lun</span></td>
+            <td>
+              <div class="note-text">Kaffeintroduksjon. Key take-away at jeg kan spisse budskapet mitt noe mer og han…</div>
+              <div class="follow-text">↳ Ingen, Korn Ferry tar kontakt.</div>
+            </td>
+            <td><button class="small danger" onclick="deleteEntry(1776269352574)">Slett</button></td>
+          </tr>
+        
+      </tbody>
+    </table>
+  </div>
+    <div id="mobile-cards" class="mobile-cards">
+    <div class="meeting-card">
+      <div class="meeting-card-top">
+        <div>
+          <div class="name">Bjørn Håkon Bærug</div>
+          <div class="company">Korn Ferry / Senior Partner</div>
+        </div>
+        <span class="badge b-warm">Lun</span>
+      </div>
+      <div class="meeting-card-meta">
+        <span>14. apr 2026</span><span>·</span><span>Headhunter</span>
+      </div>
+      <div class="meeting-card-notes">Kaffeintroduksjon. Key take-away at jeg kan spisse budskapet mitt noe mer og han noterte at jeg har bredere fokus enn ku…</div>
+      <div class="meeting-card-follow">↳ Ingen, Korn Ferry tar kontakt.</div>
+      <div class="meeting-card-actions">
+        <button class="small danger" onclick="deleteEntry(1776269352574)">Slett</button>
+      </div>
+    </div>
+  </div>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'jobsearch_meetings_v2';
+const URL_KEY = 'jobsearch_script_url';
+const KEY_KEY = 'jobsearch_secret_key';
+let entries = [];
+let scriptUrl = localStorage.getItem(URL_KEY) || '';
+let secretKey = localStorage.getItem(KEY_KEY) || '';
+
+// Init
+try { entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) {}
+document.getElementById('f-date').value = todayStr();
+
+if (scriptUrl && secretKey) {
+  document.getElementById('setup-banner').style.display = 'none';
+  setSync('loading', 'Laster inn...');
+  loadFromSheets();
+} else {
+  setSync('', 'Ikke tilkoblet');
+  render();
+}
+
+function saveScriptUrl() {
+  const val = document.getElementById('script-url').value.trim();
+  const key = document.getElementById('script-key').value.trim();
+  if (!val.startsWith('https://script.google.com')) {
+    alert('URL-en ser ikke riktig ut. Den skal starte med https://script.google.com/macros/s/...');
+    return;
+  }
+  if (!key) {
+    alert('Fyll inn den hemmelige nøkkelen fra Code.gs');
+    return;
+  }
+  scriptUrl = val;
+  secretKey = key;
+  localStorage.setItem(URL_KEY, scriptUrl);
+  localStorage.setItem(KEY_KEY, secretKey);
+  document.getElementById('setup-banner').style.display = 'none';
+  setSync('loading', 'Kobler til...');
+  loadFromSheets();
+}
+
+function setSync(state, text) {
+  const dot = document.getElementById('sync-dot');
+  dot.className = 'sync-dot' + (state ? ' ' + state : '');
+  document.getElementById('sync-text').textContent = text;
+}
+
+async function apiCall(payload) {
+  if (!scriptUrl) return null;
+  const res = await fetch(scriptUrl, {
+    method: 'POST',
+    body: JSON.stringify({ ...payload, key: secretKey })
+  });
+  return await res.json();
+}
+
+async function loadFromSheets() {
+  if (!scriptUrl) return;
+  setSync('loading', 'Laster...');
+  try {
+    const data = await apiCall({ action: 'getAll' });
+    if (data && data.ok) {
+      entries = data.entries || [];
+      // Normalize date field (Sheets may return date objects as strings)
+      entries = entries.map(e => ({
+        ...e,
+        date: e.date ? String(e.date).slice(0,10) : ''
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      setSync('ok', 'Synkronisert');
+      render();
+    } else {
+      setSync('err', 'Feil ved lasting');
+    }
+  } catch(err) {
+    setSync('err', 'Tilkoblingsfeil');
+    render();
+  }
+}
+
+async function addEntry() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Fyll inn navn på personen du møtte.'); return; }
+
+  const entry = {
+    id: Date.now(),
+    name,
+    company: document.getElementById('f-company').value.trim(),
+    date: document.getElementById('f-date').value,
+    type: document.getElementById('f-type').value,
+    status: document.getElementById('f-status').value,
+    notes: document.getElementById('f-notes').value.trim(),
+    follow: document.getElementById('f-follow').value.trim()
+  };
+
+  entries.unshift(entry);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  clearForm();
+  render();
+
+  if (scriptUrl) {
+    setSync('loading', 'Lagrer...');
+    try {
+      await apiCall({ action: 'save', entry });
+      setSync('ok', 'Lagret i Google Sheets');
+    } catch(e) {
+      setSync('err', 'Lagret lokalt – ikke synkronisert');
+    }
+  }
+}
+
+async function deleteEntry(id) {
+  if (!confirm('Er du sikker på at du vil slette dette møtet?')) return;
+  entries = entries.filter(e => e.id !== id);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  render();
+
+  if (scriptUrl) {
+    setSync('loading', 'Sletter...');
+    try {
+      await apiCall({ action: 'delete', id });
+      setSync('ok', 'Synkronisert');
+    } catch(e) {
+      setSync('err', 'Slettet lokalt – ikke synkronisert');
+    }
+  }
+}
+
+function clearForm() {
+  ['f-name','f-company','f-notes','f-follow'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-date').value = todayStr();
+  document.getElementById('f-type').value = 'Headhunter';
+  document.getElementById('f-status').value = 'hot';
+  document.getElementById('f-name').focus();
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function filtered() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const fs = document.getElementById('filter-status').value;
+  const ft = document.getElementById('filter-type').value;
+  return entries.filter(e => {
+    const txt = (e.name+' '+e.company+' '+e.notes+' '+e.follow).toLowerCase();
+    return (!q || txt.includes(q)) && (!fs || e.status === fs) && (!ft || e.type === ft);
+  });
+}
+
+const statusLabel = { hot:'Varm', warm:'Lun', cold:'Kald', done:'Avsluttet' };
+const statusClass = { hot:'b-hot', warm:'b-warm', cold:'b-cold', done:'b-done' };
+
+function fmtDate(d) {
+  if (!d) return '–';
+  const s = String(d).slice(0,10);
+  const [y,m,day] = s.split('-');
+  const months = ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
+  return `${parseInt(day)}. ${months[parseInt(m)-1]} ${y}`;
+}
+
+function esc(str) {
+  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function render() {
+  const list = filtered();
+  const hotCount = entries.filter(e => e.status === 'hot').length;
+  const followCount = entries.filter(e => e.follow).length;
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat">
+      <div class="stat-number">${entries.length}</div>
+      <div class="stat-label">Totalt møter</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">${hotCount}</div>
+      <div class="stat-label">Varme leads</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">${followCount}</div>
+      <div class="stat-label">Aktive oppfølginger</div>
+    </div>
+  `;
+
+  const empty = `<div class="empty">${entries.length ? 'Ingen møter matcher søket.' : 'Ingen møter ennå.<br>Legg til ditt første møte ovenfor.'}</div>`;
+
+  if (!list.length) {
+    document.getElementById('desktop-table').innerHTML = empty;
+    document.getElementById('mobile-cards').innerHTML = empty;
+    return;
+  }
+
+  // Desktop tabell
+  document.getElementById('desktop-table').innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Person</th><th>Dato</th><th>Type</th><th>Status</th>
+        <th>Notater / oppfølging</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${list.map(e => `
+          <tr>
+            <td><div class="name">${esc(e.name)}</div><div class="company">${esc(e.company)||'–'}</div></td>
+            <td style="white-space:nowrap;color:var(--muted);font-size:13px">${fmtDate(e.date)}</td>
+            <td><span style="font-size:12px;color:var(--muted)">${esc(e.type)}</span></td>
+            <td><span class="badge ${statusClass[e.status]}">${statusLabel[e.status]}</span></td>
+            <td>
+              <div class="note-text">${esc(e.notes ? e.notes.slice(0,80)+(e.notes.length>80?'…':'') : '–')}</div>
+              ${e.follow ? `<div class="follow-text">↳ ${esc(e.follow)}</div>` : ''}
+            </td>
+            <td><button class="small danger" onclick="deleteEntry(${e.id})">Slett</button></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+
+  // Mobilkort
+  document.getElementById('mobile-cards').innerHTML = list.map(e => `
+    <div class="meeting-card">
+      <div class="meeting-card-top">
+        <div>
+          <div class="name">${esc(e.name)}</div>
+          <div class="company">${esc(e.company)||''}</div>
+        </div>
+        <span class="badge ${statusClass[e.status]}">${statusLabel[e.status]}</span>
+      </div>
+      <div class="meeting-card-meta">
+        <span>${fmtDate(e.date)}</span><span>·</span><span>${esc(e.type)}</span>
+      </div>
+      ${e.notes ? `<div class="meeting-card-notes">${esc(e.notes.slice(0,120))}${e.notes.length>120?'…':''}</div>` : ''}
+      ${e.follow ? `<div class="meeting-card-follow">↳ ${esc(e.follow)}</div>` : ''}
+      <div class="meeting-card-actions">
+        <button class="small danger" onclick="deleteEntry(${e.id})">Slett</button>
+      </div>
+    </div>
+  `).join('');
+}
+</script>
+
+
+</body></html>
